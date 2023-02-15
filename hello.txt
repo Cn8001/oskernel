@@ -1,0 +1,3 @@
+Hello world! This is my first message from the 16bit kernel
+ I change the message
+ I changed it again

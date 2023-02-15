@@ -33,23 +33,45 @@ step2:
     ; End of segmentation
 
 
-
-
-
-
-
-    /* Interrupt vector table -> 0x00 adresinde başlar (0x0 * 16 + 0x00 => 0)*/
-    mov word[ss:0x00],handle_zero   ; Ilk 2 byte offset
-    mov word[ss:0x02],0x7c0         ; Son 2 byte SEGMENT (segment *16 + offset)(Bır interrupt 4 byte)
-
-    int 0x00                        ; 0x0 * 16 + (0x00) (Interrupt adresi hesaplama)
-    /*End of interrupt vector table*/
-
-
-
-
-
+    ;CHS disk okuma başlangıcı
+    mov ah,2                     ; Okuma modu
+    mov al,1                        ; Number of sectors to read
+    mov ch,0                        ; Cyclinder number (Low 8 bits of CHS)
+    mov dh,0                        ; Head number (two bits of CHS) (DL drive numberi bios bootta dlye koyuyor.)
+    mov cl,2                        ; Sector number (2. sektörü okumak istiyoruz.)
+    mov bx,buffer                   ; Where to put datas (0x7c0 * 16 + offset)
+    int 0x13                        ; Disk interruptu
+    jc error                        ; Eğer carry flag (cf) 0 değilse atlar.
+    ; Cyclinder, head and sector okuma bitişi
    
+    mov si,buffer
+    call print
     jmp $
+
+error:
+    mov si,error_message
+    call print
+    jmp $
+
+print:
+    mov bx,0
+.loop:
+    lodsb
+    cmp al,0
+    je .done
+    call print_char
+    jmp .loop
+.done:
+    ret
+
+print_char:
+    mov ah,0eh
+    int 0x10
+    ret
+
+error_message: db 'Disk read error',0   ; Eğer 1. sektör dışında olursa bunu okuyor.
+
 times 510-($-$$) db 0
 dw 0xAA55
+
+buffer: ;Diskten okunan verinin konulacağı yer (cs:offset) (0x7c0 * 16 + 200)
