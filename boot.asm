@@ -10,7 +10,18 @@ times 33 db 0 ; BPB için byteler
 start:
     jmp 0x7c0:step2         ; cs:start'e gittiği için cs -> 0x7c0 oluyor (segmentler 16 ile çarpılır.) cs yi ayarlıyoruz.
 
+
+handle_zero:
+    mov ah,0eh
+    mov bx,0
+    mov al,'D'
+    int 0x10
+    iret
+
 step2:
+
+
+    ; Segmentation (BIOS kendi kafasına göre segment atabilir bu yüzden orjin 0 ve segmentleri biz ayarlıyoruz.)
     cli                 ;Segmentleri ayarlarken interruptla kesmesin
     mov ax,0x7c0        ; ax * 16 + offset (16 ile çarpılıyor diye)
     mov ds,ax
@@ -19,28 +30,26 @@ step2:
     mov ss,ax
     mov sp,0x7c00      ; Bu 16 ile çarpılmıyor.
     sti
+    ; End of segmentation
 
-    mov si,message
-    call print
+
+
+
+
+
+
+    /* Interrupt vector table -> 0x00 adresinde başlar (0x0 * 16 + 0x00 => 0)*/
+    mov word[ss:0x00],handle_zero   ; Ilk 2 byte offset
+    mov word[ss:0x02],0x7c0         ; Son 2 byte SEGMENT (segment *16 + offset)(Bır interrupt 4 byte)
+
+    int 0x00                        ; 0x0 * 16 + (0x00) (Interrupt adresi hesaplama)
+    /*End of interrupt vector table*/
+
+
+
+
+
+   
     jmp $
-
-print:
-    mov bx,0
-.loop:
-    lodsb
-    cmp al,0
-    je .done
-    call print_char
-    jmp .loop
-.done:
-    ret
-
-print_char:
-    mov ah,0eh
-    int 0x10
-    ret
-
-
-message: db 'Hello world!',0
 times 510-($-$$) db 0
 dw 0xAA55
