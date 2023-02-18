@@ -12,7 +12,7 @@ times 33 db 0 ; BPB için byteler
 
 
 start:
-    jmp 0:step2         ; cs:start'e gittiği için cs -> 0x7c0 oluyor (segmentler 16 ile çarpılır.) cs yi ayarlıyoruz.
+    jmp 0:step2         ; cs:start'e gittiği için cs -> 0 oluyor (segmentler 16 ile çarpılır.) cs yi ayarlıyoruz.
 
 step2:
     ; Segmentation (BIOS kendi kafasına göre segment atabilir bu yüzden orjin 0 ve segmentleri biz ayarlıyoruz.)
@@ -24,14 +24,13 @@ step2:
     mov sp,0x7c00      ; Bu 16 ile çarpılmıyor.
     sti
     ; End of segmentation
-
-load_protected:
+.load_protected:
     cli
     lgdt[gdt_descriptor]
     mov eax,cr0
     or eax,0x1
     mov cr0,eax
-    jmp CODE_SEG:load32 ; GDT_CODE code segmentin olduğu yer ve böyle yapınca cs'yi 0x8 yapıyor ama DS yi elle yapmalıyız
+    jmp CODE_SEG:preload32
 
 gdt_start:
 gdt_null: ; 64 bit 0
@@ -59,26 +58,74 @@ gdt_end:
 gdt_descriptor:
     dw gdt_end - gdt_start -1
     dd gdt_start
+
 [BITS 32]
-load32:
-    ;When we jumped cs automaticly set to CODE_SEG (aka GDT_CODE aka 0x8) BUT DS HAVEN'T SET
-    mov ax,DATA_SEG
-    mov ds,ax
-    mov ss,ax
-    mov es,ax
-    mov fs,ax
-    mov gs,ax
-    mov ebp,0x00200000  ; Base pointer
-    mov esp,ebp         ; Stack pointer starts the same address with base but grows
-    ; End of setting data etc. selectors
+preload32:
+    mov eax,1           ; Starting sector (0. sektör -> Bootloader)
+    mov ecx,100        ; Okunacak sektör sayısı
+    mov edi,0x0100000   ; 1M'ye yükle (Yükleme orjini) (insw)
+    call ata_lba_read
+    jmp CODE_SEG:0x0100000  ; Kerneli buraya yükledik (GDT_CODE:1M)
 
-    ; Starting to enable A20
-    in al, 0x92
-    or al, 2
-    out 0x92, al
-    ; End of enabling A20
+ata_lba_read:
+    mov ebx,eax         ; Backup LBA
+    ; Send highest 8 bits of LBA to controller
+    shr eax,24          ; 24 bit sağa kaydır
+    or eax,0xE0         ; Select the master drive
+    mov dx,0x1F6        ; Port
+    out dx,al           ; Send 8 bits to the port
+    ; Finish sending highest 8 bits of LBA
 
+    ; Kaç sektör okuyacağımızı gönder
+    mov eax,ecx
+    mov dx,0x1F2    ; Our port
+    out dx,al       ; Send total sectors to the port
+    ; End of sending total sector count
 
-    jmp $
+    ; Send more bits of the LBA
+    mov eax,ebx     ; Restore the LBA
+    mov dx,0x1F3
+    out dx,al
+    ; Finished sending more bits of the LBA
+
+    ; Send more bits of the LBA
+    mov dx,0x1F4
+    mov eax,ebx     ; Restore the LBA
+    shr eax,8       ; 8 bit sağa kaydır. (32 >> 8 -> 24)
+    out dx,al
+    ; Finish sendin more bits of the LBA
+
+    ; Send upper 16 bits of the LBA
+    mov dx,0x1F5
+    mov eax,ebx     ; Restore the LBA
+    shr eax,16
+    out dx,al
+    ; Finish sending upper 16 bits of the LBA
+
+    mov dx,0x1f7
+    mov al,0x20
+    out dx,al
+
+    ; Read all sectors into memory
+.next_sector:
+    push ecx
+
+;Checking if we need to read
+.try_again:
+    mov dx,0x1f7
+    in al,dx
+    test al,8
+    jz .try_again
+
+; We need to read 256 words (512 bytes) at one time
+    mov ecx,256
+    mov dx,0x1f0
+    rep insw    ; insw -> 16 bit okur. rep -> ecx kadar tekrar eder. 
+    ;edi ile işaretli alana (1M) atıyor. Böylece kernel 1M ye yükleniyor, linker de buna göre adresleme yapıyor.
+    pop ecx
+    loop .next_sector   ; Ecx kadar tekrar eder.
+    ; End of reading sectors into memory
+    ret
+
 times 510-($-$$) db 0
 dw 0xAA55
