@@ -1,5 +1,6 @@
 [BITS 32]
 global _start
+extern kernel_main
 DATA_SEG equ 0x10
 _start:
     ;When we jumped cs automaticly set to CODE_SEG (aka GDT_CODE aka 0x8) BUT DS HAVEN'T SET
@@ -19,5 +20,9 @@ _start:
     out 0x92, al
     ; End of enabling A20
 
+    ; mov word[0xb8000],0x0241 -> VGA memory
 
+    call kernel_main
     jmp $
+
+times 512-($-$$) db 0 ; To avoid alignment issues we must make the kernel.asm divisible by 16
