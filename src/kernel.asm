@@ -23,6 +23,5 @@ _start:
     ; mov word[0xb8000],0x0241 -> VGA memory
 
     call kernel_main
-    jmp $
 
 times 512-($-$$) db 0 ; To avoid alignment issues we must make the kernel.asm divisible by 16

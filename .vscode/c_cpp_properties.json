@@ -1,0 +1,38 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/includes"
+            ],
+            "defines": [],
+            "compilerPath": "/home/cn8001/Tools/Cross/bin/i686-elf-gcc",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x86",
+            "cStandard": "gnu99",
+            "compilerArgs": [
+                "-g",
+                "-ffreestanding",
+                "-falign-jumps",
+                "-falign-functions",
+                "-falign-labels",
+                "-falign-jumps",
+                "-fstrength-reduce",
+                "-fomit-frame-pointer",
+                "-finline-functions",
+                "-Wno-unused-function",
+                "-fno-builtin",
+                "-Werror",
+                "-Wno-unused-label",
+                "-Wno-cpp",
+                "-Wno-unused-parameter",
+                "-nostdlib",
+                "-nostartfiles",
+                "-nodefaultlibs ",
+                "-Wall ",
+                "-O0"
+            ]
+        }
+    ],
+    "version": 4
+}
