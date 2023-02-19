@@ -24,4 +24,6 @@ _start:
 
     call kernel_main
 
+    jmp $
+
 times 512-($-$$) db 0 ; To avoid alignment issues we must make the kernel.asm divisible by 16
