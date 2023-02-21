@@ -62,6 +62,9 @@ void kernel_main(){
     // Initalize the interrupt descriptor table
     idt_init();
 
+    //After initialize the idt enable interrupts
+    enable_interrupts(); 
+
     outb(0x60,0xff);
 
     print("Hello world!\ntest\n\nDeneme");

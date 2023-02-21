@@ -22,6 +22,17 @@ _start:
 
     ; mov word[0xb8000],0x0241 -> VGA memory
 
+    ;Start to remap PIC
+    mov al,00010001b    ; Initialization mode
+    out 0x20,al         ; Tell the master PIC
+
+    mov al,0x20         ; Where to map master pic
+    out 0x21,al         
+
+    mov al,00000001b
+    out 0x21,al
+    ;End of remaping PIC
+
     call kernel_main
 
     jmp $

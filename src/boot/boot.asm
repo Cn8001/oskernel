@@ -17,7 +17,7 @@ start:
 step2:
     ; Segmentation (BIOS kendi kafasına göre segment atabilir bu yüzden orjin 0 ve segmentleri biz ayarlıyoruz.)
     cli                 ;Segmentleri ayarlarken interruptla kesmesin
-    mov ax,0x00        ; ax * 16 + offset (16 ile çarpılıyor diye)
+    mov ax,0x0        ; ax * 16 + offset (16 ile çarpılıyor diye)
     mov ds,ax
     mov es,ax
     mov ss,ax
