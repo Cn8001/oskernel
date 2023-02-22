@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "idt.h"
-#include "io.h"
+#include "kheap.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_col;
@@ -57,7 +57,11 @@ void print(const char* str){
 }
 
 void kernel_main(){
+
     terminal_initialize();
+
+    //Initialize the kernel heap
+    kheap_init();
 
     // Initalize the interrupt descriptor table
     idt_init();
@@ -65,7 +69,15 @@ void kernel_main(){
     //After initialize the idt enable interrupts
     enable_interrupts(); 
 
-    outb(0x60,0xff);
+    void* ptr = kmalloc(50);
+    void* ptr2 = kmalloc(5000);
+    void* ptr4 = kmalloc(5600);
+    kfree(ptr);
+
+    void* ptr3 = kmalloc(3000);
+    if(ptr || ptr2 || ptr3 || ptr4){
+
+    }
 
     print("Hello world!\ntest\n\nDeneme");
 }
