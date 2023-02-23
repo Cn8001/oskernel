@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include "idt.h"
 #include "kheap.h"
+#include "paging.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_col;
@@ -55,7 +56,7 @@ void print(const char* str){
         terminal_writechar(str[i],15);
     }
 }
-
+static struct paging_4gb_chunk* kernel_chunk = 0;
 void kernel_main(){
 
     terminal_initialize();
@@ -66,18 +67,24 @@ void kernel_main(){
     // Initalize the interrupt descriptor table
     idt_init();
 
+    //Setup paging
+    kernel_chunk = paging_new_4gb(PAGING_IS_WRITABLE | PAGING_PAGE_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    
+    //Switch to kernel chunk
+    paging_switch(paging_4gb_chunk_get_directory(kernel_chunk));
+    char* ptr = (char*)kzalloc(4096);
+    paging_set(paging_4gb_chunk_get_directory(kernel_chunk),(void*)0x1000,(uint32_t)ptr | PAGING_IS_WRITABLE | PAGING_PAGE_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+    //Enable paging
+    enable_paging();
+
+    char* ptr2 = (char*)(0x1000);
+    ptr2[0] = 'A';
+    ptr2[1] = 'B';
+    print(ptr);
+
     //After initialize the idt enable interrupts
     enable_interrupts(); 
 
-    void* ptr = kmalloc(50);
-    void* ptr2 = kmalloc(5000);
-    void* ptr4 = kmalloc(5600);
-    kfree(ptr);
-
-    void* ptr3 = kmalloc(3000);
-    if(ptr || ptr2 || ptr3 || ptr4){
-
-    }
 
     print("Hello world!\ntest\n\nDeneme");
 }
