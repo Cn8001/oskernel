@@ -14,4 +14,6 @@
 //Tableyi başka yere yüklüyoruz.
 #define HESOS_HEAP_TABLE_ADDRESS 0x00007E00
 
+#define HESOS_DISK_SECTOR_SIZE 512
+
 #endif

@@ -4,7 +4,7 @@
 unsigned char insb(unsigned short port);
 unsigned short insw(unsigned short port);
 
-void outb(unsigned char val, unsigned char port);
-void outw(unsigned short val, unsigned short port);
+void outb(unsigned short port,unsigned char val);
+void outw(unsigned short port,unsigned short val);
 
 #endif
