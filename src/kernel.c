@@ -5,6 +5,8 @@
 #include "kheap.h"
 #include "paging.h"
 #include "disk.h"
+#include "pparser.h"
+#include "string.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_col;
@@ -43,14 +45,6 @@ void terminal_initialize(){
     }
 }
 
-size_t strlen(const char* str){
-    size_t len = 0;
-    while(str[len]){
-        len++;
-    }
-    return len;
-}
-
 void print(const char* str){
     size_t len = strlen(str);
     for(size_t i = 0; i < len; i++){
@@ -82,6 +76,11 @@ void kernel_main(){
 
     //After initialize the idt enable interrupts
     enable_interrupts(); 
+
+    struct path_root* root_path2 = pathparser_parse("0:/ppad/shell.txt",NULL);
+    if(root_path2){
+
+    }
 
 
     print("Hello world!\ntest\n\nDeneme");

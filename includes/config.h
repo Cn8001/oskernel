@@ -16,4 +16,6 @@
 
 #define HESOS_DISK_SECTOR_SIZE 512
 
+#define HESOS_MAX_PATH 108
+
 #endif
