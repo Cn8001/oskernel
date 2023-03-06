@@ -4,11 +4,31 @@ BITS 16
 CODE_SEG equ 0x8
 DATA_SEG equ 0x10
 
-_start:
-    jmp short start ; BIOS Parameter block ilk üç byteyi böyle istiyor.
-    nop
+jmp short start ; BIOS Parameter block ilk üç byteyi böyle istiyor.
+nop
 
-times 33 db 0 ; BPB için byteler
+;FAT16 Header
+OEMIdentifier       db 'HESOS   '
+BytesPerSector      dw 0x200
+SectorsPerCluster   db 0x80
+ReservedSectors     dw 200  ;Size of sectors where kernel would be
+FATCopies           db 0x02
+RootDirEntries      dw 0x40
+NumSectors          dw 0x00
+MediaType           db 0xf8
+SectorsPerFat       dw 0x100
+SectorsPerTrack     dw 0x20
+NumberOfHeads       dw 0x40
+HiddenSectors       dd 0x00
+SectorsBig          dd 0x773594
+
+;Extended BPB (Dos 4.0)
+DriveNumber         db 0x80
+WinNTBit            db 0x00
+Signature           db 0x29
+VolumeID            dd 0xd105
+VolumeIDString      db 'HESOS BOOTS'
+SystemIDString      db 'FAT16   '
 
 
 start:

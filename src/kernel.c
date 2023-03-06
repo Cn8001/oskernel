@@ -7,6 +7,8 @@
 #include "disk.h"
 #include "pparser.h"
 #include "string.h"
+#include "streamer.h"
+#include "fat/fat16.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_col;
@@ -59,6 +61,9 @@ void kernel_main(){
     //Initialize the kernel heap
     kheap_init();
 
+    //Initialize filesystems
+    fs_init();
+
     // Initalize the interrupt descriptor table
     idt_init();
 
@@ -75,13 +80,12 @@ void kernel_main(){
     enable_paging();
 
     //After initialize the idt enable interrupts
-    enable_interrupts(); 
+    enable_interrupts();
 
-    struct path_root* root_path2 = pathparser_parse("0:/ppad/shell.txt",NULL);
-    if(root_path2){
-
-    }
-
+    struct disk_stream* streamer = diskstreamer_new(0);
+    diskstreamer_seek(streamer,0x201);
+    unsigned char cdfg = 0;
+    diskstreamer_read(streamer,&cdfg,1);
 
     print("Hello world!\ntest\n\nDeneme");
 }
