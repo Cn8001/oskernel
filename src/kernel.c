@@ -82,10 +82,5 @@ void kernel_main(){
     //After initialize the idt enable interrupts
     enable_interrupts();
 
-    struct disk_stream* streamer = diskstreamer_new(0);
-    diskstreamer_seek(streamer,0x201);
-    unsigned char cdfg = 0;
-    diskstreamer_read(streamer,&cdfg,1);
-
     print("Hello world!\ntest\n\nDeneme");
 }

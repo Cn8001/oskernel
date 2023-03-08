@@ -9,12 +9,12 @@ struct disk_stream* diskstreamer_new(int disk_id){
     }
     struct disk_stream* streamer = kzalloc(sizeof(struct disk_stream));
     streamer->disk = disk;
-    streamer->pos = 0;
+    streamer->pos = 0x0-16; //Normal kodda 16 yok ama bizde 16 byte sonrasını okudupu için -16 koydum
     return streamer;
 }
 
 int diskstreamer_seek(struct disk_stream* stream, int pos){
-    stream->pos = pos;
+    stream->pos = pos-16; //Normal kodda 16 yok ama bizde 16 bit sonrasını okuduğu için -16 koydum
     return 0;
 }
 

@@ -9,9 +9,12 @@ typedef unsigned int HESOS_DISK_TYPE;
 #include "file.h"
 
 struct disk{
+    int id;
     HESOS_DISK_TYPE type;
     int sector_size;
     struct filesystem* filesystem; //Diskte hangi fsnin kullanıldığı
+
+    void* private;      //Private data of our filesystem (Her diskin ayrı bir root directorysi var o yüzden fste değil diskte tutuyoruz.)
 };
 
 int disk_read_block(struct disk* idisk,unsigned int lba, int total,void* buf);
