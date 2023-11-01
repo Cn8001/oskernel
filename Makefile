@@ -7,6 +7,9 @@ FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign
 all: bin/boot.bin bin/kernel.bin
 	rm -rf bin/os.bin
 	dd if=bin/boot.bin >> bin/os.bin
+	dd if=./bin/kernel.bin >> ./bin/os.bin
+	dd if=/dev/zero bs=512 count=100 >> ./bin/os.bin
+
 
 bin/boot.bin: src/boot/boot.asm
 	nasm -f bin src/boot/boot.asm -o bin/boot.bin
