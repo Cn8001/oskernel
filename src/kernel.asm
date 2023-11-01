@@ -3,6 +3,7 @@
 CODE_SEG equ 0x8
 DATA_SEG equ 0x10
 
+extern kernel_main
 global _start
 
 _start:
@@ -22,4 +23,7 @@ _start:
     or al, 2
     out 0x92, al
 
+    call kernel_main
     jmp $
+
+times 512-($-$$) db 0
