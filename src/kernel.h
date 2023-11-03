@@ -5,4 +5,5 @@ typedef struct{
 }vga_first_buffer;
 void print(char *ptr);
 void kernel_main();
+
 #endif

@@ -1,7 +1,7 @@
 FILES = build/kernel.asm.o build/kernel.o
 LD = ${PREFIX}/i686-elf-ld
 CC = ${PREFIX}/i686-elf-gcc
-INCLUDES = -I.src/
+INCLUDES = -I./src/
 FLAGS = -g -ffreestanding -falign-jumps -falign-functions -falign-labels -falign-loops -fstrength-reduce -fomit-frame-pointer -finline-functions -Wno-unused-functions -fno-builtin -Werror -Wno-unused-label -Wno-cpp -Wno-unused-parameter -nostdlib -nostartfiles -nodefaultlibs -Wall -O0 -Iinc
 
 all: bin/boot.bin bin/kernel.bin

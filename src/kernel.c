@@ -39,6 +39,6 @@ void print(char *ptr){
 
 void kernel_main(){
     init_screen();
-    print("Hello world!");
+    print("Hello world");
     draw_chars();
 }
