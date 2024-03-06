@@ -1,2 +1,3 @@
 # oskernel
-32-bit kernel written mostly in C according to the tutorial from dragonzap.com
+32-bit multitasking kernel written in C and assembly according to the tutorial from dragonzap.com
+Current level: ASCII textmode
