@@ -14,7 +14,7 @@
 #define PAGING_CACHE_DISABLED   0b0010000
 
 struct paging_4gb_chunk{
-    uint32_t* directory;
+    uint32_t* directory_entry;
 };
 
 struct paging_4gb_chunk* paging_new_4gb(uint8_t flags);
@@ -22,5 +22,5 @@ void paging_switch(uint32_t* dir);
 uint32_t* paging_4gb_chunk_get_directory(struct paging_4gb_chunk* chunk_4gb);
 void enable_paging();
 int paging_set(uint32_t* dir,void* virtual_addr,uint32_t val);
-static bool paging_aligned(void* addr);
+bool paging_aligned(void* addr);
 #endif

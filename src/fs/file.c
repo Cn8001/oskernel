@@ -4,6 +4,8 @@
 #include "memory.h"
 #include "status.h"
 #include "kheap.h"
+#include "disk.h"
+#include "string.h"
 #include "fat/fat16.h"
 
 struct filesystem* filesystems[HESOS_MAX_FILESYSTEMS];
@@ -79,7 +81,71 @@ struct filesystem* fs_resolve(struct disk* disk){
     }
     return fs;
 }
+FILE_MODE file_get_mode_by_string(const char* str){
+    FILE_MODE mode = FILE_MODE_INVALID;
+    if(strncmp(str,"r",1) == 0){
+        mode = FILE_MODE_READ;
+    }
+    else if(strncmp(str,"w",1) == 0){
+        mode = FILE_MODE_WRITE;
+    }
+    else if(strncmp(str,"a",1) == 0){
+        mode = FILE_MODE_APPEND;
+    }
+    return mode;
+}
+int fopen(const char* filename, const char* mode_str){
+    int res = 0;
+    struct path_root* root_path = pathparser_parse(filename,NULL);
+    if(!root_path){
+        res = -EINVARG;
+        goto out;
+    }
 
-int fopen(const char* filename, const char* file_mode){
-    return -EIO;
+    //Gelen parametre 0:/ şeklindeyse
+    if(!root_path->first){
+        res = -EINVARG;
+        goto out;
+    }
+
+    struct disk* disk = disk_get(root_path->drive_no);
+
+    //Eğer öyle bir disk yoksa
+    if(!disk){
+        res = -EIO;
+        goto out;
+    }
+
+    //Eğer diskte bir filesystem yoksa
+    if(!disk->filesystem){
+        res = -EIO;
+        goto out;
+    }
+
+    FILE_MODE mode = file_get_mode_by_string(mode_str);
+    //Eğer mode olarak gönderilen string r,w,a değilse
+    if(mode == FILE_MODE_INVALID){
+        res = -EINVARG;
+        goto out;
+    }
+    void* descriptor_private_data = disk->filesystem->open(disk,root_path->first,mode);
+    if(ISERR(descriptor_private_data)){
+        res = ERROR_I(descriptor_private_data);
+        goto out;
+    }
+    struct file_descriptor* desc = 0;
+    res = fs_new_descriptor(&desc);
+    if(res < 0)
+        goto out;
+    desc->filesystem = disk->filesystem;
+    desc->disk = disk;
+    //Dosya hakkında bilgiler (FAT hakkında değil)
+    desc->private = descriptor_private_data;
+    res = desc->index;
+out:
+    //Fopen negative value döndürmemeli
+    if(res < 0){
+        res = 0;
+    }
+    return res;
 }

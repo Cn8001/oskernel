@@ -11,5 +11,6 @@ struct disk_stream{
 struct disk_stream* diskstreamer_new(int disk_id);
 int diskstreamer_seek(struct disk_stream* stream, int pos);
 int diskstreamer_read(struct disk_stream* stream, void* out, int total_bytes);
-void diskstreamer_free(struct disk_stream* stream);
+int diskstreamer_seek2(struct disk_stream* stream, int pos);
+void diskstreamer_close(struct disk_stream* stream);
 #endif

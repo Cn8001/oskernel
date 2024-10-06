@@ -14,7 +14,7 @@ struct disk{
     int sector_size;
     struct filesystem* filesystem; //Diskte hangi fsnin kullanıldığı
 
-    void* private;      //Private data of our filesystem (Her diskin ayrı bir root directorysi var o yüzden fste değil diskte tutuyoruz.)
+    void* fs_private;      //Private data of our filesystem (Her diskin ayrı bir root directorysi var o yüzden fste değil diskte tutuyoruz.)
 };
 
 int disk_read_block(struct disk* idisk,unsigned int lba, int total,void* buf);

@@ -2,6 +2,7 @@
 #include "io.h"
 #include "config.h"
 #include "memory.h"
+#include "kernel.h"
 #include "status.h"
 
 struct disk disk;

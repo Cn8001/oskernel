@@ -83,4 +83,14 @@ void kernel_main(){
     enable_interrupts();
 
     print("Hello world!\ntest\n\nDeneme");
+
+    int fd = fopen("0:/hello.txt","r");
+    if(fd){
+        print("We opened hello.txt\n");
+    }
+
+    struct disk_stream* stream = diskstreamer_new(0);
+    diskstreamer_seek2(stream,0x03);
+    unsigned char cdfg[7];
+    diskstreamer_read(stream,&cdfg,7);
 }
